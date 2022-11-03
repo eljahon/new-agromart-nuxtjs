@@ -1,0 +1,32 @@
+
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14.x"
+      - name: Deploy with SSH
+        uses: appleboy/ssh-action@master
+        with:
+          key: ${{ secrets.KEY }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /root/front/agromart-nuxt
+            git restore .
+            git pull origin master
+            yarn install
+            pm2 restart nuxtapp
